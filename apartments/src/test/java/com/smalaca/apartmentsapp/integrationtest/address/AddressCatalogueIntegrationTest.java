@@ -11,27 +11,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AddressCatalogueIntegrationTest {
     private final AddressCatalogue addressCatalogue = new AddressCatalogueFactory().addressCatalogue();
+    private final AddressContract addressContract = new AddressContract();
 
     @Test
     void shouldRecognizeMissingFields() {
-        Optional<Address> check = addressCatalogue.check("Rynek Główny", null, null, "Kraków", "Polska");
-        assertThat(check).isEmpty();
+        AddressContractScenario scenario = addressContract.missingFields();
+        AddressContractGiven given = scenario.given();
+        
+        Optional<Address> check = addressCatalogue.check(given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
+        
+        assertThat(check).isEqualTo(scenario.expected());
     }
 
     @Test
     void shouldRecognizeInvalidAddress() {
-        Optional<Address> check = addressCatalogue.check("Rynek Główny", "13", "42", "Kraków", "Polska");
-        assertThat(check).isEmpty();
+        AddressContractScenario scenario = addressContract.invalidAddress();
+        AddressContractGiven given = scenario.given();
+
+        Optional<Address> check = addressCatalogue.check(given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
+
+        assertThat(check).isEqualTo(scenario.expected());
     }
 
     @Test
     void shouldRecognizeValidAddress() {
-        Optional<Address> check = addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska");
-        assertThat(check).isPresent();
-        assertThat(check.get().getStreet()).isEqualTo("Rynek Główny");
-        assertThat(check.get().getHouseNumber()).isEqualTo("43");
-        assertThat(check.get().getApartmentNumber()).isEqualTo("2");
-        assertThat(check.get().getCity()).isEqualTo("Kraków");
-        assertThat(check.get().getCountry()).isEqualTo("Polska");
+        AddressContractScenario scenario = addressContract.validAddress();
+        AddressContractGiven given = scenario.given();
+
+        Optional<Address> check = addressCatalogue.check(given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
+
+        assertThat(check).isEqualTo(scenario.expected());
     }
 }
