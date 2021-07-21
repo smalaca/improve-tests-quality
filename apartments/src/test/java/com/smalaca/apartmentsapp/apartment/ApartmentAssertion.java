@@ -6,12 +6,8 @@ import org.assertj.core.api.Assertions;
 public class ApartmentAssertion {
     private final Apartment actual;
 
-    private ApartmentAssertion(Apartment actual) {
+    public ApartmentAssertion(Apartment actual) {
         this.actual = actual;
-    }
-
-    public static ApartmentAssertion assertThat(Apartment actual) {
-        return new ApartmentAssertion(actual);
     }
 
     public ApartmentAssertion hasIdEqualTo(ApartmentId expected) {

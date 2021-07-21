@@ -2,6 +2,7 @@ package com.smalaca.apartmentsapp.services.apartment;
 
 import com.smalaca.apartmentsapp.address.AddressCatalogue;
 import com.smalaca.apartmentsapp.apartment.*;
+import com.smalaca.apartmentsapp.assertions.AssertionsFacade;
 import com.smalaca.apartmentsapp.events.EventRegistry;
 import com.smalaca.apartmentsapp.events.InvalidAddressRecognized;
 import com.smalaca.apartmentsapp.events.OwnerNotFound;
@@ -96,7 +97,7 @@ class ApartmentServiceTest {
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
         assertThat(apartmentId).isNotEqualTo(ApartmentId.nullObject());
-        ApartmentAssertion.assertThat(thenApartmentCreated())
+        AssertionsFacade.assertThat(thenApartmentCreated())
             .hasIdEqualTo(apartmentId)
             .hasOwnerIdEqualTo(ownerId)
             .hasStreetEqualTo("Rynek Główny")
