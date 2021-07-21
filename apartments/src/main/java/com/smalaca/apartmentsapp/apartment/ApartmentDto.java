@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter(AccessLevel.PACKAGE)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class ApartmentDto {
     private final String street;
     private final String houseNumber;

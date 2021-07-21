@@ -10,7 +10,7 @@ public class Apartment {
     private final OwnerId ownerId;
     private final Address address;
 
-    public Apartment(OwnerId ownerId, Address address) {
+    Apartment(OwnerId ownerId, Address address) {
         this.ownerId = ownerId;
         this.address = address;
     }
