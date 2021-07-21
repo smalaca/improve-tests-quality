@@ -17,7 +17,7 @@ public class AddressContractScenario {
         return given;
     }
 
-    Optional<Address> expected() {
+    public Optional<Address> expected() {
         return expected;
     }
 }

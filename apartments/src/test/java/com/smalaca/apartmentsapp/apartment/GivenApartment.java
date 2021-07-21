@@ -3,6 +3,9 @@ package com.smalaca.apartmentsapp.apartment;
 import com.smalaca.apartmentsapp.address.Address;
 import com.smalaca.apartmentsapp.address.AddressCatalogue;
 import com.smalaca.apartmentsapp.address.AddressTestFactory;
+import com.smalaca.apartmentsapp.integrationtest.address.AddressContract;
+import com.smalaca.apartmentsapp.integrationtest.address.AddressContractGiven;
+import com.smalaca.apartmentsapp.integrationtest.address.AddressContractScenario;
 import com.smalaca.apartmentsapp.owner.OwnerId;
 
 import java.util.Optional;
@@ -40,8 +43,14 @@ public class GivenApartment {
     }
 
     public ApartmentDto invalidDto() {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.empty());
+        AddressContractScenario scenario = new AddressContract().invalidAddress();
+        AddressContractGiven given = scenario.given();
+        ApartmentDto apartmentDto = new ApartmentDto(
+                given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
+
+        given(addressCatalogue.check(given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry()))
+                .willReturn(scenario.expected());
+
         return apartmentDto;
     }
 }
