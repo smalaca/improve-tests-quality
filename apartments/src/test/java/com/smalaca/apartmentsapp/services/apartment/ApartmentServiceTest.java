@@ -33,7 +33,9 @@ class ApartmentServiceTest {
         OwnerId ownerId = new OwnerId(UUID.randomUUID());
         ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
         given(ownerRepository.exists(ownerId)).willReturn(false);
+
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
+
         assertThat(apartmentId).isEqualTo(ApartmentId.nullObject());
         then(apartmentRepository).should(never()).save(any());
         ArgumentCaptor<OwnerNotFound> captor = ArgumentCaptor.forClass(OwnerNotFound.class);
@@ -47,7 +49,9 @@ class ApartmentServiceTest {
         given(ownerRepository.exists(ownerId)).willReturn(true);
         ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
         given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.empty());
+
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
+
         assertThat(apartmentId).isEqualTo(ApartmentId.nullObject());
         then(apartmentRepository).should(never()).save(any());
         ArgumentCaptor<InvalidAddressRecognized> captor = ArgumentCaptor.forClass(InvalidAddressRecognized.class);
@@ -68,7 +72,9 @@ class ApartmentServiceTest {
         given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
         Apartment apartment = new Apartment(ownerId, address);
         given(apartmentRepository.findBy(address)).willReturn(Optional.of(apartment));
+
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
+
         assertThat(apartmentId).isNotEqualTo(ApartmentId.nullObject());
         assertThat(apartmentId).isNotNull();
         then(apartmentRepository).should(never()).save(any());
@@ -85,7 +91,9 @@ class ApartmentServiceTest {
         given(apartmentRepository.save(any())).will(invocation -> {
             return ((Apartment) invocation.getArgument(0)).getId();
         });
+
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
+
         assertThat(apartmentId).isNotEqualTo(ApartmentId.nullObject());
         ArgumentCaptor<Apartment> captor = ArgumentCaptor.forClass(Apartment.class);
         then(apartmentRepository).should().save(captor.capture());
