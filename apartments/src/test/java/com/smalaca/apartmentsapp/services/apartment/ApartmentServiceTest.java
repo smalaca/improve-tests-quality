@@ -1,6 +1,5 @@
 package com.smalaca.apartmentsapp.services.apartment;
 
-import com.smalaca.apartmentsapp.address.Address;
 import com.smalaca.apartmentsapp.address.AddressCatalogue;
 import com.smalaca.apartmentsapp.apartment.*;
 import com.smalaca.apartmentsapp.events.EventRegistry;
@@ -12,11 +11,8 @@ import com.smalaca.apartmentsapp.owner.OwnerRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -29,11 +25,12 @@ class ApartmentServiceTest {
     private final ApartmentService service = new ApartmentService(ownerRepository, apartmentRepository, addressCatalogue, eventRegistry);
 
     private final GivenOwner givenOwner = new GivenOwner(ownerRepository);
+    private final GivenApartment givenApartment = new GivenApartment(addressCatalogue, apartmentRepository);
 
     @Test
     void shouldNotAddApartmentWhenOwnerDoesNotExist() {
         OwnerId ownerId = givenOwner.notExisting();
-        ApartmentDto apartmentDto = givenValidApartmentDto();
+        ApartmentDto apartmentDto = givenApartment.validDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
@@ -47,7 +44,7 @@ class ApartmentServiceTest {
     @Test
     void shouldRecognizeInvalidAddress() {
         OwnerId ownerId = givenOwner.existing();
-        ApartmentDto apartmentDto = givenInvalidApartmentDto();
+        ApartmentDto apartmentDto = givenApartment.invalidDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
@@ -62,16 +59,10 @@ class ApartmentServiceTest {
         assertThat(captor.getValue().getCountry()).isEqualTo("Polska");
     }
 
-    private ApartmentDto givenInvalidApartmentDto() {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.empty());
-        return apartmentDto;
-    }
-
     @Test
     void shouldReturnIdOfExistingApartment() {
         OwnerId ownerId = givenOwner.existing();
-        ApartmentDto apartmentDto = givenDtoForExistingApartment(ownerId);
+        ApartmentDto apartmentDto = givenApartment.dtoForExisting(ownerId);
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
@@ -80,19 +71,10 @@ class ApartmentServiceTest {
         then(apartmentRepository).should(never()).save(any());
     }
 
-    private ApartmentDto givenDtoForExistingApartment(OwnerId ownerId) {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = new Address("Rynek Główny", "43", "2", "Kraków", "Polska");
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
-        Apartment apartment = new Apartment(ownerId, address);
-        given(apartmentRepository.findBy(address)).willReturn(Optional.of(apartment));
-        return apartmentDto;
-    }
-
     @Test
     void shouldCreateNewApartment() {
         OwnerId ownerId = givenOwner.existing();
-        ApartmentDto apartmentDto = givenValidApartmentDto();
+        ApartmentDto apartmentDto = givenApartment.validDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
@@ -106,16 +88,5 @@ class ApartmentServiceTest {
         assertThat(captor.getValue().getAddress().getApartmentNumber()).isEqualTo("2");
         assertThat(captor.getValue().getAddress().getCity()).isEqualTo("Kraków");
         assertThat(captor.getValue().getAddress().getCountry()).isEqualTo("Polska");
-    }
-
-    private ApartmentDto givenValidApartmentDto() {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = new Address("Rynek Główny", "43", "2", "Kraków", "Polska");
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
-        given(apartmentRepository.findBy(address)).willReturn(Optional.empty());
-        given(apartmentRepository.save(any())).will(invocation -> {
-            return ((Apartment) invocation.getArgument(0)).getId();
-        });
-        return apartmentDto;
     }
 }
