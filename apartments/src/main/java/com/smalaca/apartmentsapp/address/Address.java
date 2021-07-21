@@ -1,10 +1,11 @@
 package com.smalaca.apartmentsapp.address;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Getter
 @EqualsAndHashCode
 public class Address {

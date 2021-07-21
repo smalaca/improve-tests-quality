@@ -2,6 +2,7 @@ package com.smalaca.apartmentsapp.apartment;
 
 import com.smalaca.apartmentsapp.address.Address;
 import com.smalaca.apartmentsapp.address.AddressCatalogue;
+import com.smalaca.apartmentsapp.address.AddressTestFactory;
 import com.smalaca.apartmentsapp.owner.OwnerId;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class GivenApartment {
 
     public ApartmentDto validDtoForNotExisting() {
         ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = new Address("Rynek Główny", "43", "2", "Kraków", "Polska");
+        Address address = AddressTestFactory.create();
         given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
         given(apartmentRepository.findBy(address)).willReturn(Optional.empty());
         given(apartmentRepository.save(any())).will(invocation -> {
@@ -31,7 +32,7 @@ public class GivenApartment {
 
     public ApartmentDto dtoForExisting(OwnerId ownerId) {
         ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = new Address("Rynek Główny", "43", "2", "Kraków", "Polska");
+        Address address = AddressTestFactory.create();
         given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
         Apartment apartment = new Apartment(ownerId, address);
         given(apartmentRepository.findBy(address)).willReturn(Optional.of(apartment));
