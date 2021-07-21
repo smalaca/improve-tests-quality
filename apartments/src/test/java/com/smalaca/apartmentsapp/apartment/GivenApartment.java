@@ -18,7 +18,7 @@ public class GivenApartment {
         this.apartmentRepository = apartmentRepository;
     }
 
-    public ApartmentDto validDto() {
+    public ApartmentDto validDtoForNotExisting() {
         ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
         Address address = new Address("Rynek Główny", "43", "2", "Kraków", "Polska");
         given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));

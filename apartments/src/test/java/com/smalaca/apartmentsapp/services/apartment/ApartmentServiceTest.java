@@ -30,7 +30,7 @@ class ApartmentServiceTest {
     @Test
     void shouldNotAddApartmentWhenOwnerDoesNotExist() {
         OwnerId ownerId = givenOwner.notExisting();
-        ApartmentDto apartmentDto = givenApartment.validDto();
+        ApartmentDto apartmentDto = givenApartment.validDtoForNotExisting();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
@@ -74,19 +74,24 @@ class ApartmentServiceTest {
     @Test
     void shouldCreateNewApartment() {
         OwnerId ownerId = givenOwner.existing();
-        ApartmentDto apartmentDto = givenApartment.validDto();
+        ApartmentDto apartmentDto = givenApartment.validDtoForNotExisting();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
         assertThat(apartmentId).isNotEqualTo(ApartmentId.nullObject());
+        ApartmentAssertion.assertThat(thenApartmentCreated())
+            .hasIdEqualTo(apartmentId)
+            .hasOwnerIdEqualTo(ownerId)
+            .hasStreetEqualTo("Rynek Główny")
+            .hasHouseNumberEqualTo("43")
+            .hasApartmentNumberEqualTo("2")
+            .hasCityEqualTo("Kraków")
+            .hasCountryEqualTo("Polska");
+    }
+
+    private Apartment thenApartmentCreated() {
         ArgumentCaptor<Apartment> captor = ArgumentCaptor.forClass(Apartment.class);
         then(apartmentRepository).should().save(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(apartmentId);
-        assertThat(captor.getValue().getOwnerId()).isEqualTo(ownerId);
-        assertThat(captor.getValue().getAddress().getStreet()).isEqualTo("Rynek Główny");
-        assertThat(captor.getValue().getAddress().getHouseNumber()).isEqualTo("43");
-        assertThat(captor.getValue().getAddress().getApartmentNumber()).isEqualTo("2");
-        assertThat(captor.getValue().getAddress().getCity()).isEqualTo("Kraków");
-        assertThat(captor.getValue().getAddress().getCountry()).isEqualTo("Polska");
+        return captor.getValue();
     }
 }
