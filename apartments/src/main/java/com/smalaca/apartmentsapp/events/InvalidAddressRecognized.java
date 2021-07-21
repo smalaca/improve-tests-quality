@@ -1,11 +1,11 @@
-package com.smalaca.apartmentsapp.address;
+package com.smalaca.apartmentsapp.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
-public class Address {
+@AllArgsConstructor
+public class InvalidAddressRecognized {
     private final String street;
     private final String houseNumber;
     private final String apartmentNumber;
