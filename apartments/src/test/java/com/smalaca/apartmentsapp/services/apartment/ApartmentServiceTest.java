@@ -12,6 +12,7 @@ import com.smalaca.apartmentsapp.owner.OwnerRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import static com.smalaca.apartmentsapp.address.AddressTestFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -65,11 +66,11 @@ class ApartmentServiceTest {
     private void thenInvalidAddressRecognized() {
         ArgumentCaptor<InvalidAddressRecognized> captor = ArgumentCaptor.forClass(InvalidAddressRecognized.class);
         then(eventRegistry).should().publish(captor.capture());
-        assertThat(captor.getValue().getStreet()).isEqualTo("Rynek Główny");
-        assertThat(captor.getValue().getHouseNumber()).isEqualTo("43");
-        assertThat(captor.getValue().getApartmentNumber()).isEqualTo("2");
-        assertThat(captor.getValue().getCity()).isEqualTo("Kraków");
-        assertThat(captor.getValue().getCountry()).isEqualTo("Polska");
+        assertThat(captor.getValue().getStreet()).isEqualTo(STREET);
+        assertThat(captor.getValue().getHouseNumber()).isEqualTo(HOUSE_NUMBER);
+        assertThat(captor.getValue().getApartmentNumber()).isEqualTo(APARTMENT_NUMBER);
+        assertThat(captor.getValue().getCity()).isEqualTo(CITY);
+        assertThat(captor.getValue().getCountry()).isEqualTo(COUNTRY);
     }
 
     @Test
@@ -100,11 +101,11 @@ class ApartmentServiceTest {
         AssertionsFacade.assertThat(thenApartmentCreated())
             .hasIdEqualTo(apartmentId)
             .hasOwnerIdEqualTo(ownerId)
-            .hasStreetEqualTo("Rynek Główny")
-            .hasHouseNumberEqualTo("43")
-            .hasApartmentNumberEqualTo("2")
-            .hasCityEqualTo("Kraków")
-            .hasCountryEqualTo("Polska");
+            .hasStreetEqualTo(STREET)
+            .hasHouseNumberEqualTo(HOUSE_NUMBER)
+            .hasApartmentNumberEqualTo(APARTMENT_NUMBER)
+            .hasCityEqualTo(CITY)
+            .hasCountryEqualTo(COUNTRY);
     }
 
     private Apartment thenApartmentCreated() {
