@@ -34,8 +34,16 @@ class ApartmentServiceTest {
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
-        assertThat(apartmentId).isEqualTo(ApartmentId.nullObject());
+        thenNoIdReturned(apartmentId);
         thenApartmentWasNotCreated();
+        thenOwnerNotFoundRecognized(ownerId);
+    }
+
+    private void thenNoIdReturned(ApartmentId apartmentId) {
+        assertThat(apartmentId).isEqualTo(ApartmentId.nullObject());
+    }
+
+    private void thenOwnerNotFoundRecognized(OwnerId ownerId) {
         ArgumentCaptor<OwnerNotFound> captor = ArgumentCaptor.forClass(OwnerNotFound.class);
         then(eventRegistry).should().publish(captor.capture());
         assertThat(captor.getValue().getOwnerId()).isEqualTo(ownerId);
@@ -48,8 +56,12 @@ class ApartmentServiceTest {
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
 
-        assertThat(apartmentId).isEqualTo(ApartmentId.nullObject());
+        thenNoIdReturned(apartmentId);
         thenApartmentWasNotCreated();
+        thenInvalidAddressRecognized();
+    }
+
+    private void thenInvalidAddressRecognized() {
         ArgumentCaptor<InvalidAddressRecognized> captor = ArgumentCaptor.forClass(InvalidAddressRecognized.class);
         then(eventRegistry).should().publish(captor.capture());
         assertThat(captor.getValue().getStreet()).isEqualTo("Rynek Główny");
