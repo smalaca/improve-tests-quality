@@ -6,13 +6,13 @@ import com.smalaca.apartmentsapp.apartment.*;
 import com.smalaca.apartmentsapp.events.EventRegistry;
 import com.smalaca.apartmentsapp.events.InvalidAddressRecognized;
 import com.smalaca.apartmentsapp.events.OwnerNotFound;
+import com.smalaca.apartmentsapp.owner.GivenOwner;
 import com.smalaca.apartmentsapp.owner.OwnerId;
 import com.smalaca.apartmentsapp.owner.OwnerRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,9 +28,11 @@ class ApartmentServiceTest {
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final ApartmentService service = new ApartmentService(ownerRepository, apartmentRepository, addressCatalogue, eventRegistry);
 
+    private final GivenOwner givenOwner = new GivenOwner(ownerRepository);
+
     @Test
     void shouldNotAddApartmentWhenOwnerDoesNotExist() {
-        OwnerId ownerId = givenNotExistingOwner();
+        OwnerId ownerId = givenOwner.notExisting();
         ApartmentDto apartmentDto = givenValidApartmentDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
@@ -42,16 +44,9 @@ class ApartmentServiceTest {
         assertThat(captor.getValue().getOwnerId()).isEqualTo(ownerId);
     }
 
-    private OwnerId givenNotExistingOwner() {
-        OwnerId ownerId = new OwnerId(UUID.randomUUID());
-        given(ownerRepository.exists(ownerId)).willReturn(false);
-
-        return ownerId;
-    }
-
     @Test
     void shouldRecognizeInvalidAddress() {
-        OwnerId ownerId = givenExistingOwner();
+        OwnerId ownerId = givenOwner.existing();
         ApartmentDto apartmentDto = givenInvalidApartmentDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
@@ -75,7 +70,7 @@ class ApartmentServiceTest {
 
     @Test
     void shouldReturnIdOfExistingApartment() {
-        OwnerId ownerId = givenExistingOwner();
+        OwnerId ownerId = givenOwner.existing();
         ApartmentDto apartmentDto = givenDtoForExistingApartment(ownerId);
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
@@ -96,7 +91,7 @@ class ApartmentServiceTest {
 
     @Test
     void shouldCreateNewApartment() {
-        OwnerId ownerId = givenExistingOwner();
+        OwnerId ownerId = givenOwner.existing();
         ApartmentDto apartmentDto = givenValidApartmentDto();
 
         ApartmentId apartmentId = service.add(ownerId, apartmentDto);
@@ -122,11 +117,5 @@ class ApartmentServiceTest {
             return ((Apartment) invocation.getArgument(0)).getId();
         });
         return apartmentDto;
-    }
-
-    private OwnerId givenExistingOwner() {
-        OwnerId ownerId = new OwnerId(UUID.randomUUID());
-        given(ownerRepository.exists(ownerId)).willReturn(true);
-        return ownerId;
     }
 }
