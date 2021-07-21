@@ -2,7 +2,6 @@ package com.smalaca.apartmentsapp.apartment;
 
 import com.smalaca.apartmentsapp.address.Address;
 import com.smalaca.apartmentsapp.address.AddressCatalogue;
-import com.smalaca.apartmentsapp.address.AddressTestFactory;
 import com.smalaca.apartmentsapp.integrationtest.address.AddressContract;
 import com.smalaca.apartmentsapp.integrationtest.address.AddressContractGiven;
 import com.smalaca.apartmentsapp.integrationtest.address.AddressContractScenario;
@@ -16,6 +15,7 @@ import static org.mockito.BDDMockito.given;
 public class GivenApartment {
     private final AddressCatalogue addressCatalogue;
     private final ApartmentRepository apartmentRepository;
+    private final AddressContract addressContract = new AddressContract();
 
     public GivenApartment(AddressCatalogue addressCatalogue, ApartmentRepository apartmentRepository) {
         this.addressCatalogue = addressCatalogue;
@@ -23,34 +23,45 @@ public class GivenApartment {
     }
 
     public ApartmentDto validDtoForNotExisting() {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = AddressTestFactory.create();
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
+        AddressContractScenario scenario = addressContract.validAddress();
+        givenNotExistingApartment(scenario.expected().get());
+
+        return apartmentDto(givenAddress(scenario));
+    }
+
+    private void givenNotExistingApartment(Address address) {
         given(apartmentRepository.findBy(address)).willReturn(Optional.empty());
         given(apartmentRepository.save(any())).will(invocation -> {
             return ((Apartment) invocation.getArgument(0)).getId();
         });
-        return apartmentDto;
     }
 
     public ApartmentDto dtoForExisting(OwnerId ownerId) {
-        ApartmentDto apartmentDto = new ApartmentDto("Rynek Główny", "43", "2", "Kraków", "Polska");
-        Address address = AddressTestFactory.create();
-        given(addressCatalogue.check("Rynek Główny", "43", "2", "Kraków", "Polska")).willReturn(Optional.of(address));
+        AddressContractScenario scenario = addressContract.validAddress();
+        givenExistingApartment(ownerId, scenario.expected().get());
+
+        return apartmentDto(givenAddress(scenario));
+    }
+
+    private void givenExistingApartment(OwnerId ownerId, Address address) {
         Apartment apartment = new Apartment(ownerId, address);
         given(apartmentRepository.findBy(address)).willReturn(Optional.of(apartment));
-        return apartmentDto;
     }
 
     public ApartmentDto invalidDto() {
-        AddressContractScenario scenario = new AddressContract().invalidAddress();
-        AddressContractGiven given = scenario.given();
-        ApartmentDto apartmentDto = new ApartmentDto(
-                given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
+        return apartmentDto(givenAddress(addressContract.invalidAddress()));
+    }
 
+    private AddressContractGiven givenAddress(AddressContractScenario scenario) {
+        AddressContractGiven given = scenario.given();
         given(addressCatalogue.check(given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry()))
                 .willReturn(scenario.expected());
 
-        return apartmentDto;
+        return given;
+    }
+
+    private ApartmentDto apartmentDto(AddressContractGiven given) {
+        return new ApartmentDto(
+                    given.getStreet(), given.getHouseNumber(), given.getApartmentNumber(), given.getCity(), given.getCountry());
     }
 }

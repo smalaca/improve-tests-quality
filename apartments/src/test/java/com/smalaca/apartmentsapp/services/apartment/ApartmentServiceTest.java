@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static com.smalaca.apartmentsapp.address.AddressTestFactory.*;
+import static com.smalaca.apartmentsapp.integrationtest.address.AddressContract.INVALID_APARTMENT_NUMBER;
+import static com.smalaca.apartmentsapp.integrationtest.address.AddressContract.INVALID_HOUSE_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -67,8 +69,8 @@ class ApartmentServiceTest {
         ArgumentCaptor<InvalidAddressRecognized> captor = ArgumentCaptor.forClass(InvalidAddressRecognized.class);
         then(eventRegistry).should().publish(captor.capture());
         assertThat(captor.getValue().getStreet()).isEqualTo(STREET);
-        assertThat(captor.getValue().getHouseNumber()).isEqualTo(HOUSE_NUMBER);
-        assertThat(captor.getValue().getApartmentNumber()).isEqualTo(APARTMENT_NUMBER);
+        assertThat(captor.getValue().getHouseNumber()).isEqualTo(INVALID_HOUSE_NUMBER);
+        assertThat(captor.getValue().getApartmentNumber()).isEqualTo(INVALID_APARTMENT_NUMBER);
         assertThat(captor.getValue().getCity()).isEqualTo(CITY);
         assertThat(captor.getValue().getCountry()).isEqualTo(COUNTRY);
     }
